@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevOps Lifecycle – Travel Blog (Wanderlust)</title>
+
+<!-- Icon set (optional, tiny) -->
+<link href="https://unpkg.com/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+  :root{
+    --p:#ff512f;         /* primary */
+    --s:#dd2476;         /* secondary */
+    --bg:#0f0f12;        /* dark bg */
+    --card:#15161b;      /* card bg */
+    --muted:#a9acb5;     /* muted text */
+    --ok:#2ecc71;        /* green */
+    --warn:#f39c12;      /* amber */
+    --shadow:0 12px 30px rgba(0,0,0,.35);
+    --rad:22px;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    background: radial-gradient(1200px 800px at 80% -10%, rgba(221,36,118,.18), transparent 60%),
+                radial-gradient(900px 700px at -10% 20%, rgba(255,81,47,.15), transparent 60%),
+                var(--bg);
+    color:#f5f7fa;
+  }
+
+  /* Top nav */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter: blur(12px);
+    background: linear-gradient(90deg, rgba(21,22,27,.9), rgba(21,22,27,.65));
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .nav .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:1100px; margin:auto; padding:10px 16px;
+  }
+  .brand{
+    display:flex; gap:10px; align-items:center; font-weight:700; letter-spacing:.3px
+  }
+  .brand i{color:var(--p); font-size:22px}
+  .nav a{
+    color:#fff; text-decoration:none; margin-left:18px; font-size:.95rem;
+    opacity:.9;
+  }
+  .nav a:hover{opacity:1; color:#fff}
+  .btn{
+    background: linear-gradient(135deg, var(--p), var(--s));
+    border:none; color:white; padding:10px 16px; border-radius:999px;
+    font-weight:600; box-shadow:0 8px 20px rgba(221,36,118,.35); cursor:pointer;
+  }
+
+  /* Hero */
+  .hero{
+    max-width:1100px; margin:40px auto 10px; padding:28px 16px 8px;
+    display:grid; grid-template-columns:1.2fr .8fr; gap:28px; align-items:center;
+  }
+  .title{
+    font-size:clamp(28px, 4vw, 44px);
+    line-height:1.1; font-weight:800;
+    background: linear-gradient(135deg, #fff 40%, #ffe3f0);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .lead{color:#e7e9ee; opacity:.9; margin:12px 0 18px; max-width:60ch}
+  .heroCard{
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.08);
+    padding:18px; border-radius:var(--rad);
+    box-shadow:var(--shadow);
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+  .chip{
+    border:1px solid rgba(255,255,255,.14);
+    padding:6px 10px; border-radius:999px; font-size:.85rem; color:#e8e9ee; opacity:.9
+  }
+
+  /* Section wrapper */
+  section{max-width:1100px; margin:0 auto; padding:36px 16px}
+  .secTitle{
+    display:flex; gap:12px; align-items:center; margin-bottom:20px
+  }
+  .secTitle h2{
+    margin:0; font-size:clamp(22px, 2.6vw, 30px)
+  }
+  .badge{
+    background:linear-gradient(135deg, var(--p), var(--s));
+    border-radius:999px; padding:6px 12px; font-size:.8rem; font-weight:700
+  }
+
+  /* Diagram card */
+  .diagram{
+    background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:var(--rad); overflow:hidden; box-shadow:var(--shadow)
+  }
+  .diagram .bar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 16px; border-bottom:1px solid rgba(255,255,255,.06);
+    background:rgba(0,0,0,.15)
+  }
+  .diagram img{width:100%; display:block; max-height:560px; object-fit:contain; background:#0b0c10}
+
+  /* Pipeline grid */
+  .grid{
+    display:grid; gap:16px;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+  }
+  @media (max-width:980px){ .hero{grid-template-columns:1fr} .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px; padding:18px; position:relative; overflow:hidden;
+    transition:transform .35s ease, box-shadow .35s ease, border-color .35s;
+    box-shadow:var(--shadow);
+  }
+  .card:hover{ transform: translateY(-6px); border-color:rgba(255,255,255,.22)}
+  .step{
+    display:flex; align-items:center; gap:10px; margin-bottom:10px; font-weight:800
+  }
+  .step .dot{
+    width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--p),var(--s));
+    box-shadow:0 0 0 4px rgba(221,36,118,.18);
+  }
+  .muted{color:var(--muted); font-size:.95rem}
+  .tagrow{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+  .tag{
+    font-size:.75rem; border:1px solid rgba(255,255,255,.14);
+    padding:4px 8px; border-radius:999px; color:#e8e9ef; opacity:.9
+  }
+
+  /* Animated reveal */
+  .reveal{opacity:0; transform:translateY(20px); transition:all .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.show{opacity:1; transform:none}
+
+  /* Footer */
+  footer{
+    margin-top:26px; padding:28px 16px; text-align:center;
+    color:#cfd3dc; border-top:1px solid rgba(255,255,255,.06);
+  }
+</style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="wrap">
+      <div class="brand"><i class="ri-compass-3-fill"></i> Wanderlust • DevOps</div>
+      <div>
+        <a href="#diagram">Diagram</a>
+        <a href="#pipeline">Lifecycle</a>
+        <a href="#flow">End-to-End Flow</a>
+        <a href="#contact" class="btn" style="margin-left:14px; padding:8px 14px;">Contact</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div>
+      <h1 class="title reveal">DevOps Lifecycle for the <span style="background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;background-clip:text;color:transparent;">Travel Blog Website</span></h1>
+      <p class="lead reveal">
+        This page explains how the <b>Wanderlust</b> site (HTML/CSS/JS) moves from an idea to a live, monitored product using
+        a clean <b>DevOps lifecycle</b>: Plan → Code → Build → Test → Release → Deploy → Operate → Monitor → Plan (feedback loop).
+      </p>
+      <div class="chips reveal" style="transition-delay:.08s">
+        <span class="chip"><i class="ri-git-branch-line"></i> Git / PR Review</span>
+        <span class="chip"><i class="ri-github-fill"></i> GitHub Actions CI</span>
+        <span class="chip"><i class="ri-cloud-line"></i> Netlify / Vercel</span>
+        <span class="chip"><i class="ri-timer-flash-line"></i> Lighthouse & Playwright</span>
+        <span class="chip"><i class="ri-bar-chart-2-line"></i> Web Vitals & Logs</span>
+      </div>
+    </div>
+    <div class="heroCard reveal" style="transition-delay:.12s">
+      <h3 style="margin:0 0 10px">What reviewers will see</h3>
+      <ul class="muted" style="margin:0; padding-left:18px; line-height:1.7">
+        <li>Clear mapping of each DevOps stage to your travel blog.</li>
+        <li>Concise tools & outputs per stage (build, tests, artifacts, deploy).</li>
+        <li>Feedback loop: monitoring → backlog → next sprint.</li>
+      </ul>
+      <div class="tagrow">
+        <span class="tag">Static bundle</span>
+        <span class="tag">CDN cache</span>
+        <span class="tag">Preview URL (staging)</span>
+        <span class="tag">Blue/Green (optional)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- DIAGRAM -->
+  <section id="diagram">
+    <div class="secTitle">
+      <span class="badge">Diagram</span>
+      <h2>DevOps Lifecycle Diagram (Your Use-Case View)</h2>
+    </div>
+
+    <div class="diagram reveal">
+      <div class="bar">
+        <div class="muted"><i class="ri-mind-map"></i> Provided by you (PlantUML export)</div>
+        <a class="tag" href="#pipeline">Scroll to Explanation ↓</a>
+      </div>
+      <!-- Put your exported image beside index.html and keep this filename -->
+      <img src="devops-diagram.jpg" alt="DevOps Lifecycle Diagram – Travel Blog">
+    </div>
+
+    <p class="muted" style="margin-top:12px">
+      Tip: If your image name differs, edit the <code>src</code> in the <code>&lt;img&gt;</code> above.
+    </p>
+  </section>
+
+  <!-- PIPELINE -->
+  <section id="pipeline">
+    <div class="secTitle">
+      <span class="badge">Lifecycle</span>
+      <h2>Stage-by-Stage Explanation (Mapped to the Travel Blog)</h2>
+    </div>
+
+    <div class="grid">
+      <!-- PLAN -->
+      <div class="card reveal">
+        <div class="step"><span class="dot"></span> Plan</div>
+        <p class="muted">Convert ideas into backlog: destinations grid, tips page, hero banner, performance goals (LCP &lt; 2.5s).</p>
+        <div class="tagrow"><span class="tag">User stories</span><span class="tag">Wireframes</span><span class="tag">Issues</span></div>
+      </div>
+
+      <!-- CODE -->
+      <div class="card reveal" style="transition-delay:.03s">
+        <div class="step"><span class="dot"></span> Code</div>
+        <p class="muted">Implement HTML/CSS/JS, commit on <b>feature/*</b> branches, open Pull Requests for review.</p>
+        <div class="tagrow"><span class="tag">GitHub/GitLab</span><span class="tag">PR Review</span><span class="tag">ESLint/Prettier</span></div>
+      </div>
+
+      <!-- BUILD -->
+      <div class="card reveal" style="transition-delay:.06s">
+        <div class="step"><span class="dot"></span> Build</div>
+        <p class="muted">CI installs deps and creates a minified static bundle (images, CSS, JS) ready for CDN.</p>
+        <div class="tagrow"><span class="tag">npm ci</span><span class="tag">npm run build</span><span class="tag">Cache</span></div>
+      </div>
+
+      <!-- TEST -->
+      <div class="card reveal" style="transition-delay:.09s">
+        <div class="step"><span class="dot"></span> Test</div>
+        <p class="muted">Run unit/UI tests and quality gates: <b>Playwright</b> clicks pages, <b>Lighthouse</b> checks performance & a11y.</p>
+        <div class="tagrow"><span class="tag">Unit/E2E</span><span class="tag">Lighthouse</span><span class="tag">A11y</span></div>
+      </div>
+
+      <!-- RELEASE -->
+      <div class="card reveal">
+        <div class="step"><span class="dot"></span> Release</div>
+        <p class="muted">Tag a version and attach the build artifact. CI marks it as the candidate for deployment.</p>
+        <div class="tagrow"><span class="tag">SemVer</span><span class="tag">Artifacts</span><span class="tag">Changelog</span></div>
+      </div>
+
+      <!-- DEPLOY -->
+      <div class="card reveal" style="transition-delay:.03s">
+        <div class="step"><span class="dot"></span> Deploy</div>
+        <p class="muted">Continuous Delivery pushes to <b>Netlify/Vercel</b> (or S3 + CloudFront). Optional Blue/Green for zero-downtime.</p>
+        <div class="tagrow"><span class="tag">CD</span><span class="tag">Preview → Prod</span><span class="tag">Cache Invalidate</span></div>
+      </div>
+
+      <!-- OPERATE -->
+      <div class="card reveal" style="transition-delay:.06s">
+        <div class="step"><span class="dot"></span> Operate</div>
+        <p class="muted">Site runs on global CDN edge locations for fast loads of images and pages.</p>
+        <div class="tagrow"><span class="tag">CDN</span><span class="tag">SSL</span><span class="tag">Static hosting</span></div>
+      </div>
+
+      <!-- MONITOR -->
+      <div class="card reveal" style="transition-delay:.09s">
+        <div class="step"><span class="dot"></span> Monitor</div>
+        <p class="muted">Track uptime, Core Web Vitals (LCP/CLS/INP), and JS errors. Create issues from feedback → back to <b>Plan</b>.</p>
+        <div class="tagrow"><span class="tag">Logs</span><span class="tag">Web Vitals</span><span class="tag">User feedback</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOW SUMMARY -->
+  <section id="flow">
+    <div class="secTitle">
+      <span class="badge">Summary</span>
+      <h2>End-to-End CI/CD Flow for the Travel Blog</h2>
+    </div>
+
+    <div class="card reveal" style="padding:0">
+      <div style="padding:18px 18px 6px">
+        <ol class="muted" style="line-height:1.8; padding-left:18px; margin:0">
+          <li><b>Developer</b> plans features (destinations, tips, hero), writes code, pushes to Git.</li>
+          <li><b>CI</b> checks out repo → <code>npm ci</code> → <code>npm run build</code> → tests (Playwright/Lighthouse).</li>
+          <li>If green, CI creates a <b>release</b> and deploys to <b>staging (preview URL)</b>.</li>
+          <li>After UAT approval, CD promotes the same artifact to <b>production</b>, invalidates CDN cache.</li>
+          <li><b>Operations</b> monitor uptime & Web Vitals; issues/feedback go back to the <b>Plan</b> backlog.</li>
+        </ol>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; padding:12px 16px 18px; border-top:1px solid rgba(255,255,255,.08)">
+        <span class="tag"><i class="ri-seedling-line"></i> Plan</span>
+        <span class="tag"><i class="ri-code-line"></i> Code</span>
+        <span class="tag"><i class="ri-collage-line"></i> Build</span>
+        <span class="tag"><i class="ri-bug-line"></i> Test</span>
+        <span class="tag"><i class="ri-price-tag-3-line"></i> Release</span>
+        <span class="tag"><i class="ri-rocket-2-line"></i> Deploy</span>
+        <span class="tag"><i class="ri-earth-line"></i> Operate</span>
+        <span class="tag"><i class="ri-pulse-line"></i> Monitor</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT / FOOTER -->
+  <section id="contact">
+    <div class="secTitle">
+      <span class="badge">Owner</span>
+      <h2>Varshitha Gosula • Travel Blog</h2>
+    </div>
+    <div class="card reveal">
+      <p class="muted" style="margin:0 0 10px">
+        A traveler who loves writing about the moments she meets on the road and enjoys exploring with family.
+      </p>
+      <div class="tagrow">
+        <span class="tag"><i class="ri-phone-line"></i> 6302535109</span>
+        <span class="tag"><i class="ri-map-pin-line"></i> Wanderlust</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Wanderlust • DevOps Lifecycle Showcase — Designed with ❤
+  </footer>
+
+<script>
+  // Reveal-on-scroll animation
+  const items = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('show');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.12});
+  items.forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
